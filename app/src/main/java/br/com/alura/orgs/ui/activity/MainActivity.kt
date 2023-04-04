@@ -1,8 +1,10 @@
-package br.com.alura.orgs
+package br.com.alura.orgs.ui.activity
 
 import android.app.Activity
 import android.os.Bundle
-import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import br.com.alura.orgs.R
+import br.com.alura.orgs.ui.recyclerview.adapter.ListaProdutosAdapter
 
 class MainActivity : Activity() {
 
@@ -20,5 +22,8 @@ class MainActivity : Activity() {
 //        nome.text = "Cesta"
 //        descricao.text = "Laranja, manga e maçã"
 //        valor.text = "19.99"
+
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+        recyclerView.adapter = ListaProdutosAdapter()
     }
 }
