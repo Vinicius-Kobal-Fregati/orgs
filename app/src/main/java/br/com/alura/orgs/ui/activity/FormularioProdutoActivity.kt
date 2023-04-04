@@ -6,6 +6,7 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import br.com.alura.orgs.R
+import br.com.alura.orgs.dao.ProdutosDao
 import br.com.alura.orgs.model.Produto
 import java.math.BigDecimal
 
@@ -19,6 +20,7 @@ class FormularioProdutoActivity : AppCompatActivity(R.layout.activity_formulario
 
         val botaoSalvar = findViewById<Button>(R.id.botao_salvar)
         botaoSalvar.setOnClickListener {
+            // Processo de bind, vinculação entre o código fonte e o arquivo de layout
             val campoNome = findViewById<EditText>(R.id.nome)
             val nome = campoNome.text.toString()
             val campoDescricao = findViewById<EditText>(R.id.descricao)
@@ -39,6 +41,10 @@ class FormularioProdutoActivity : AppCompatActivity(R.layout.activity_formulario
             )
 
             Log.i("FormularioProduto", produtoNovo.toString())
+            val dao = ProdutosDao()
+            dao.adiciona(produtoNovo)
+            //Finaliza a activity
+            finish()
         }
     }
 }
