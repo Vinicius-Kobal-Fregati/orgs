@@ -19,6 +19,7 @@ class FormularioProdutoActivity : AppCompatActivity(R.layout.activity_formulario
 
         val botaoSalvar = findViewById<Button>(R.id.botao_salvar)
         botaoSalvar.setOnClickListener {
+            // Processo de bind, vinculação entre o código fonte e o arquivo de layout
             val campoNome = findViewById<EditText>(R.id.nome)
             val nome = campoNome.text.toString()
             val campoDescricao = findViewById<EditText>(R.id.descricao)
