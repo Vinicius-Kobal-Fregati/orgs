@@ -5,10 +5,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import br.com.alura.orgs.R
-import br.com.alura.orgs.model.Produto
+import br.com.alura.orgs.dao.ProdutosDao
 import br.com.alura.orgs.ui.recyclerview.adapter.ListaProdutosAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import java.math.BigDecimal
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,24 +16,16 @@ class MainActivity : AppCompatActivity() {
 
         //O R pode acessar tudo que está dentro de resources
         setContentView(R.layout.activity_main)
+    }
+
+    override fun onResume() {
+        super.onResume()
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+        val dao = ProdutosDao()
         recyclerView.adapter = ListaProdutosAdapter(
-            context = this, produtos = listOf(
-                Produto(
-                    nome = "teste",
-                    descricao = "teste desc",
-                    valor = BigDecimal("19.99")
-                ), Produto(
-                    nome = "teste 2",
-                    descricao = "teste desc 2",
-                    valor = BigDecimal("29.99")
-                ), Produto(
-                    nome = "teste 3",
-                    descricao = "teste desc 3",
-                    valor = BigDecimal("39.99")
-                )
-            )
+            context = this,
+            produtos = dao.buscaTodos()
         )
 
         // O RecyclerView exige um layoutManager para exibir a lista
