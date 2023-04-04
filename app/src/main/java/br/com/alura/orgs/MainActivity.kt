@@ -13,12 +13,12 @@ class MainActivity : Activity() {
         setContentView(R.layout.activity_main)
 
         // Processo de bind, vinculação entre o código fonte e o arquivo de layout
-        val nome = findViewById<TextView>(R.id.nome)
-        val descricao = findViewById<TextView>(R.id.descricao)
-        val valor = findViewById<TextView>(R.id.valor)
-
-        nome.text = "Cesta"
-        descricao.text = "Laranja, manga e maçã"
-        valor.text = "19.99"
+//        val nome = findViewById<TextView>(R.id.nome)
+//        val descricao = findViewById<TextView>(R.id.descricao)
+//        val valor = findViewById<TextView>(R.id.valor)
+//
+//        nome.text = "Cesta"
+//        descricao.text = "Laranja, manga e maçã"
+//        valor.text = "19.99"
     }
 }
