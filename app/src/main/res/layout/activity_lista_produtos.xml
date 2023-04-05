@@ -37,7 +37,7 @@
         android:contentDescription="Botão flutuante de adicionar novos produtos"
         android:focusable="true"
         android:text="Novo produto"
-        app:icon="@drawable/ic_baseline_add_24"
+        app:icon="@drawable/ic_action_add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
