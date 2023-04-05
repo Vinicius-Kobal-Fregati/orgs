@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import br.com.alura.orgs.databinding.ProdutoItemBinding
 import br.com.alura.orgs.model.Produto
+import coil.load
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.*
@@ -33,6 +34,8 @@ class ListaProdutosAdapter(
             val valor = binding.produtoItemValor
             val valorEmMoeda: String = formataParaMoedaBrasileira(produto.valor)
             valor.text = valorEmMoeda
+            // Esse load é uma extention function do coil
+            binding.imageView.load("https://st.depositphotos.com/1000141/1963/i/600/depositphotos_19638723-stock-photo-fresh-orange-fruit-with-leaf.jpg")
         }
 
         private fun formataParaMoedaBrasileira(valor: BigDecimal): String {
