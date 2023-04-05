@@ -2,11 +2,9 @@ package br.com.alura.orgs.ui.recyclerview.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import br.com.alura.orgs.R
+import br.com.alura.orgs.databinding.ProdutoItemBinding
 import br.com.alura.orgs.model.Produto
 
 class ListaProdutosAdapter(
@@ -17,15 +15,19 @@ class ListaProdutosAdapter(
     // Trabalhamos com uma cópia, mantendo o original seguro
     private val produtos = produtos.toMutableList()
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    // Sem o View Binding
+    //class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(private val binding: ProdutoItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
         fun vincula(produto: Produto) {
             // Esse itemView é a view que mandamos para ele no construtor.
-            val nome = itemView.findViewById<TextView>(R.id.produto_item_nome)
+            //val nome = itemView.findViewById<TextView>(R.id.produto_item_nome)
+            val nome = binding.produtoItemNome
             nome.text = produto.nome
-            val descricao = itemView.findViewById<TextView>(R.id.produto_item_descricao)
+            val descricao = binding.produtoItemDescricao
             descricao.text = produto.descricao
-            val valor = itemView.findViewById<TextView>(R.id.produto_item_valor)
+            val valor = binding.produtoItemValor
             valor.text = produto.valor.toPlainString()
         }
 
@@ -39,8 +41,9 @@ class ListaProdutosAdapter(
         // Forma de transformar um layout em uma view, inflando ele
         val inflater = LayoutInflater.from(context)
         // O attachToRoot precisa ser falso para o RecyclerView poder ter o controle do que exibir
-        val view = inflater.inflate(R.layout.produto_item, parent, false)
-        return ViewHolder(view)
+        //val view = inflater.inflate(R.layout.produto_item, parent, false)
+        val binding = ProdutoItemBinding.inflate(inflater, parent, false)
+        return ViewHolder(binding)
     }
 
     // Indica qual o item que o adapter está colocando, indicando sua posição
