@@ -34,7 +34,7 @@ class ListaProdutosAdapter(
             val valor = binding.produtoItemValor
             val valorEmMoeda: String = formataParaMoedaBrasileira(produto.valor)
             valor.text = valorEmMoeda
-            // Esse load é uma extention function do coil
+            // Esse load é uma extension function do coil
             binding.imageView.load("https://st.depositphotos.com/1000141/1963/i/600/depositphotos_19638723-stock-photo-fresh-orange-fruit-with-leaf.jpg")
         }
 
