@@ -3,10 +3,12 @@ package br.com.alura.orgs.ui.activity
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import br.com.alura.orgs.R
 import br.com.alura.orgs.dao.ProdutosDao
 import br.com.alura.orgs.databinding.ActivityFormularioProdutoBinding
+import br.com.alura.orgs.databinding.FormularioImagemBinding
 import br.com.alura.orgs.model.Produto
+import br.com.alura.orgs.util.GifLoader
+import coil.load
 import java.math.BigDecimal
 
 // Sem usar o View Bind seria dessa forma
@@ -19,6 +21,7 @@ class FormularioProdutoActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityFormularioProdutoBinding.inflate(layoutInflater)
     }
+    private var url: String? = null
 
     // Com o AppCompatActivity, podemos deixar de usar o setContentView passando
     // para seu construtor
@@ -29,15 +32,32 @@ class FormularioProdutoActivity : AppCompatActivity() {
         // Com o View Binding, precisamos passar esse root
         setContentView(binding.root)
         configuraBotaoSalvar()
+
         binding
             .activityFormularioProdutoImagem
             .setOnClickListener {
+                val bindingFormularioImagem = FormularioImagemBinding
+                    .inflate(layoutInflater)
+                bindingFormularioImagem.formularioImagemBotaoCarregar.setOnClickListener {
+                    val url = bindingFormularioImagem.formularioImagemUrl.text.toString()
+                    bindingFormularioImagem.formularioImagemImageview.load(
+                        url,
+                        GifLoader.geraImageLoader(this)
+                    )
+                }
+
                 AlertDialog.Builder(this)
                     //.setTitle("Título de teste")
                     //.setMessage("Mensagem de teste")
-                    .setView(R.layout.formulario_imagem)
+                    // Dessa forma não temos acesso aos campos, vamos ter que inflar a view
+                    //.setView(R.layout.formulario_imagem)
+                    .setView(bindingFormularioImagem.root)
                     .setPositiveButton("Confirmar") { _, _ ->
-
+                        url = bindingFormularioImagem.formularioImagemUrl.text.toString()
+                        binding.activityFormularioProdutoImagem.load(
+                            url,
+                            GifLoader.geraImageLoader(this)
+                        )
                     }
                     .setNegativeButton("Cancelar") { _, _ ->
 
@@ -78,7 +98,8 @@ class FormularioProdutoActivity : AppCompatActivity() {
         return Produto(
             nome = nome,
             descricao = descricao,
-            valor = valor
+            valor = valor,
+            imagem = url
         )
     }
 }
