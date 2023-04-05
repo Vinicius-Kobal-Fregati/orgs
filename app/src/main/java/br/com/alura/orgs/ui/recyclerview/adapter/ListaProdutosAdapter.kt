@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import br.com.alura.orgs.databinding.ProdutoItemBinding
 import br.com.alura.orgs.model.Produto
+import br.com.alura.orgs.util.GifLoader
 import coil.load
 import java.math.BigDecimal
 import java.text.NumberFormat
@@ -24,7 +25,7 @@ class ListaProdutosAdapter(
     class ViewHolder(private val binding: ProdutoItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun vincula(produto: Produto) {
+        fun vincula(produto: Produto, context: Context) {
             // Esse itemView é a view que mandamos para ele no construtor.
             //val nome = itemView.findViewById<TextView>(R.id.produto_item_nome)
             val nome = binding.produtoItemNome
@@ -35,7 +36,7 @@ class ListaProdutosAdapter(
             val valorEmMoeda: String = formataParaMoedaBrasileira(produto.valor)
             valor.text = valorEmMoeda
             // Esse load é uma extension function do coil
-            binding.imageView.load(produto.imagem)
+            binding.imageView.load(produto.imagem, GifLoader.geraImageLoader(context))
         }
 
         private fun formataParaMoedaBrasileira(valor: BigDecimal): String {
@@ -62,7 +63,7 @@ class ListaProdutosAdapter(
     // Indica qual o item que o adapter está colocando, indicando sua posição
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val produto = produtos[position]
-        holder.vincula(produto)
+        holder.vincula(produto, context)
     }
 
     // Determina quantos itens queremos exibir dentro dele
