@@ -21,7 +21,7 @@ class ProdutosDao {
             Produto(
                 nome = "Salada de frutas",
                 descricao = "Laranja, maçãs e uva",
-                valor = BigDecimal("19.83 ")
+                valor = BigDecimal("19.83")
             )
         )
     }
