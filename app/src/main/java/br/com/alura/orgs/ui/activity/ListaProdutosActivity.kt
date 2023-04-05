@@ -3,26 +3,27 @@ package br.com.alura.orgs.ui.activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.RecyclerView
-import br.com.alura.orgs.R
 import br.com.alura.orgs.dao.ProdutosDao
+import br.com.alura.orgs.databinding.ActivityListaProdutosBinding
 import br.com.alura.orgs.ui.recyclerview.adapter.ListaProdutosAdapter
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class ListaProdutosActivity : AppCompatActivity() {
-
 
     private val dao = ProdutosDao()
     private val adapter = ListaProdutosAdapter(
         context = this,
         produtos = dao.buscaTodos()
     )
+    private val binding by lazy {
+        ActivityListaProdutosBinding.inflate(layoutInflater)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         //O R pode acessar tudo que está dentro de resources
-        setContentView(R.layout.activity_lista_produtos)
+        //setContentView(R.layout.activity_lista_produtos)
+        setContentView(binding.root)
         configuraRecyclerView()
         configuraFab()
     }
@@ -33,7 +34,8 @@ class ListaProdutosActivity : AppCompatActivity() {
     }
 
     private fun configuraFab() {
-        val fab = findViewById<FloatingActionButton>(R.id.activity_lista_produto_fab)
+        //val fab = findViewById<FloatingActionButton>(R.id.activity_lista_produto_fab)
+        val fab = binding.activityListaProdutoFab
         fab.setOnClickListener {
             vaiParaFormularioProduto()
         }
@@ -45,7 +47,7 @@ class ListaProdutosActivity : AppCompatActivity() {
     }
 
     private fun configuraRecyclerView() {
-        val recyclerView = findViewById<RecyclerView>(R.id.activity_lista_produto_recyclerView)
+        val recyclerView = binding.activityListaProdutoRecyclerView
         recyclerView.adapter = adapter
 
         // O RecyclerView exige um layoutManager para exibir a lista
