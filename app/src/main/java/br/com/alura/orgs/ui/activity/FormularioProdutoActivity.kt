@@ -1,12 +1,15 @@
 package br.com.alura.orgs.ui.activity
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import br.com.alura.orgs.R
 import br.com.alura.orgs.dao.ProdutosDao
 import br.com.alura.orgs.databinding.ActivityFormularioProdutoBinding
+import br.com.alura.orgs.databinding.FormularioImagemBinding
 import br.com.alura.orgs.model.Produto
+import coil.load
 import java.math.BigDecimal
 
 // Sem usar o View Bind seria dessa forma
@@ -32,10 +35,19 @@ class FormularioProdutoActivity : AppCompatActivity() {
         binding
             .activityFormularioProdutoImagem
             .setOnClickListener {
+                val bindingFormularioImagem = FormularioImagemBinding
+                    .inflate(layoutInflater)
+                bindingFormularioImagem.formularioImagemBotaoCarregar.setOnClickListener {
+                    val url = bindingFormularioImagem.formularioImagemUrl.text.toString()
+                    bindingFormularioImagem.formularioImagemImageview.load(url)
+                }
+
                 AlertDialog.Builder(this)
                     //.setTitle("Título de teste")
                     //.setMessage("Mensagem de teste")
-                    .setView(R.layout.formulario_imagem)
+                    // Dessa forma não temos acesso aos campos, vamos ter que inflar a view
+                    //.setView(R.layout.formulario_imagem)
+                    .setView(bindingFormularioImagem.root)
                     .setPositiveButton("Confirmar") { _, _ ->
 
                     }
