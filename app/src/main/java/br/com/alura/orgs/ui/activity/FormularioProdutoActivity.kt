@@ -6,9 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import br.com.alura.orgs.dao.ProdutosDao
 import br.com.alura.orgs.databinding.ActivityFormularioProdutoBinding
 import br.com.alura.orgs.databinding.FormularioImagemBinding
+import br.com.alura.orgs.extension.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
-import br.com.alura.orgs.util.GifLoader
-import coil.load
 import java.math.BigDecimal
 
 // Sem usar o View Bind seria dessa forma
@@ -40,10 +39,9 @@ class FormularioProdutoActivity : AppCompatActivity() {
                     .inflate(layoutInflater)
                 bindingFormularioImagem.formularioImagemBotaoCarregar.setOnClickListener {
                     val url = bindingFormularioImagem.formularioImagemUrl.text.toString()
-                    bindingFormularioImagem.formularioImagemImageview.load(
-                        url,
-                        GifLoader.geraImageLoader(this)
-                    )
+                    bindingFormularioImagem
+                        .formularioImagemImageview
+                        .tentaCarregarImagem(url, this)
                 }
 
                 AlertDialog.Builder(this)
@@ -54,10 +52,7 @@ class FormularioProdutoActivity : AppCompatActivity() {
                     .setView(bindingFormularioImagem.root)
                     .setPositiveButton("Confirmar") { _, _ ->
                         url = bindingFormularioImagem.formularioImagemUrl.text.toString()
-                        binding.activityFormularioProdutoImagem.load(
-                            url,
-                            GifLoader.geraImageLoader(this)
-                        )
+                        binding.activityFormularioProdutoImagem.tentaCarregarImagem(url, this)
                     }
                     .setNegativeButton("Cancelar") { _, _ ->
 

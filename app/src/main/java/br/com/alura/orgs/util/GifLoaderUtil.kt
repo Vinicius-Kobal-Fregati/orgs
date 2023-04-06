@@ -6,7 +6,7 @@ import coil.ImageLoader
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 
-abstract class GifLoader {
+abstract class GifLoaderUtil {
 
     companion object {
         fun geraImageLoader(contexto: Context) = ImageLoader.Builder(contexto)

@@ -5,11 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import br.com.alura.orgs.R
 import br.com.alura.orgs.databinding.ProdutoItemBinding
+import br.com.alura.orgs.extension.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
-import br.com.alura.orgs.util.GifLoader
-import coil.load
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.*
@@ -49,14 +47,7 @@ class ListaProdutosAdapter(
             binding.imageView.visibility = visibilidade
 
             // Esse load é uma extension function do coil
-            binding.imageView.load(produto.imagem, GifLoader.geraImageLoader(context)) {
-                // Caso falhe (a imagem seja nula), ele adiciona uma imagem padrão
-                fallback(R.drawable.erro)
-
-                // Caso a imagem seja procurada e algo dê errado, ou não seja encontrada,
-                // Ele adiciona essa padrão
-                error(R.drawable.erro)
-            }
+            binding.imageView.tentaCarregarImagem(produto.imagem, context)
         }
 
         private fun formataParaMoedaBrasileira(valor: BigDecimal): String {
