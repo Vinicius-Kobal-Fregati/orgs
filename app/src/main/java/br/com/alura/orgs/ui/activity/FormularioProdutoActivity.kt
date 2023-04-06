@@ -35,29 +35,7 @@ class FormularioProdutoActivity : AppCompatActivity() {
         binding
             .activityFormularioProdutoImagem
             .setOnClickListener {
-                val bindingFormularioImagem = FormularioImagemBinding
-                    .inflate(layoutInflater)
-                bindingFormularioImagem.formularioImagemBotaoCarregar.setOnClickListener {
-                    val url = bindingFormularioImagem.formularioImagemUrl.text.toString()
-                    bindingFormularioImagem
-                        .formularioImagemImageview
-                        .tentaCarregarImagem(url, this)
-                }
 
-                AlertDialog.Builder(this)
-                    //.setTitle("Título de teste")
-                    //.setMessage("Mensagem de teste")
-                    // Dessa forma não temos acesso aos campos, vamos ter que inflar a view
-                    //.setView(R.layout.formulario_imagem)
-                    .setView(bindingFormularioImagem.root)
-                    .setPositiveButton("Confirmar") { _, _ ->
-                        url = bindingFormularioImagem.formularioImagemUrl.text.toString()
-                        binding.activityFormularioProdutoImagem.tentaCarregarImagem(url, this)
-                    }
-                    .setNegativeButton("Cancelar") { _, _ ->
-
-                    }
-                    .show()
             }
     }
 
