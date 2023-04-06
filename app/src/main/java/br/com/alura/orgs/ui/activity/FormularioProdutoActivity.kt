@@ -31,6 +31,7 @@ class FormularioProdutoActivity : AppCompatActivity() {
 
         // Com o View Binding, precisamos passar esse root
         setContentView(binding.root)
+        title = "Cadastrar produto"
         configuraBotaoSalvar()
 
         binding
