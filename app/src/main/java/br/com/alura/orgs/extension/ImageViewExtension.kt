@@ -7,21 +7,28 @@ import br.com.alura.orgs.util.GifLoaderUtil
 import coil.load
 import coil.request.ImageRequest
 
-fun ImageView.tentaCarregarImagem(url: String? = null, context: Context) {
+fun ImageView.tentaCarregarImagem(
+    url: String? = null,
+    context: Context,
+    fallback: Int = R.drawable.placeholder
+) {
     load(url, GifLoaderUtil.geraImageLoader(context)) {
-        trataCasosExcepcionais()
+        trataCasosExcepcionais(fallback)
     }
 }
 
-fun ImageView.tentaCarregarImagem(url: String? = null) {
+fun ImageView.tentaCarregarImagem(
+    url: String? = null,
+    fallback: Int = R.drawable.placeholder
+) {
     load(url) {
-        trataCasosExcepcionais()
+        trataCasosExcepcionais(fallback)
     }
 }
 
-private fun ImageRequest.Builder.trataCasosExcepcionais() {
+private fun ImageRequest.Builder.trataCasosExcepcionais(fallback: Int) {
     // Enquanto a imagem carrega, essa aparece no lugar
-    placeholder(R.drawable.placeholder)
+    placeholder(fallback)
 
     // Caso falhe (a imagem seja nula), ele adiciona uma imagem padrão
     fallback(R.drawable.erro)

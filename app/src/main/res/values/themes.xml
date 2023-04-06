@@ -16,4 +16,10 @@
         <!-- Assim criamos uma fonte global-->
         <item name="fontFamily">@font/montserrat</item>
     </style>
+
+    <!-- Ramificação do estilo, criamos um novo com base no original, mudando pequenos detalhes-->
+    <style name="Theme.Orgs.NoActionBar" parent="Theme.Orgs">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
 </resources>

@@ -1,11 +1,14 @@
 package br.com.alura.orgs.ui.recyclerview.adapter
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import br.com.alura.orgs.databinding.ProdutoItemBinding
+import br.com.alura.orgs.extension.formataParaMoedaBrasileira
 import br.com.alura.orgs.extension.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
 import java.math.BigDecimal
@@ -14,7 +17,8 @@ import java.util.*
 
 class ListaProdutosAdapter(
     private val context: Context,
-    produtos: List<Produto>
+    produtos: List<Produto>,
+    var quandoClicaNoItemListener: (produto: Produto) -> Unit = {}
 ) : RecyclerView.Adapter<ListaProdutosAdapter.ViewHolder>() {
 
     // Trabalhamos com uma cópia, mantendo o original seguro
@@ -22,10 +26,26 @@ class ListaProdutosAdapter(
 
     // Sem o View Binding
     //class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    class ViewHolder(private val binding: ProdutoItemBinding) :
+
+    //Utilizamos o inner para ter acesso aos membros da classe superior, o quandoClicaNoItemListener
+    inner class ViewHolder(private val binding: ProdutoItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
+        // O lateinit evita nullables, assim a property pode ser inicializada depois
+        private lateinit var produto: Produto
+
+        init {
+            itemView.setOnClickListener {
+                // Verifica se existe os valores na property
+                if (::produto.isInitialized) {
+                    // Precisa do inner para podermos usar este membro
+                    quandoClicaNoItemListener(produto)
+                }
+            }
+        }
+
         fun vincula(produto: Produto, context: Context) {
+            this.produto = produto
             // Esse itemView é a view que mandamos para ele no construtor.
             //val nome = itemView.findViewById<TextView>(R.id.produto_item_nome)
             val nome = binding.produtoItemNome
@@ -33,8 +53,7 @@ class ListaProdutosAdapter(
             val descricao = binding.produtoItemDescricao
             descricao.text = produto.descricao
             val valor = binding.produtoItemValor
-            val valorEmMoeda: String = formataParaMoedaBrasileira(produto.valor)
-            valor.text = valorEmMoeda
+            valor.text = produto.valor.formataParaMoedaBrasileira()
 
             val visibilidade = if (produto.imagem != null) {
                 View.VISIBLE
@@ -49,13 +68,6 @@ class ListaProdutosAdapter(
             // Esse load é uma extension function do coil
             binding.imageView.tentaCarregarImagem(produto.imagem, context)
         }
-
-        private fun formataParaMoedaBrasileira(valor: BigDecimal): String {
-            val formatadorDeMoeda: NumberFormat = NumberFormat
-                .getCurrencyInstance(Locale("pt", "br"))
-            return formatadorDeMoeda.format(valor)
-        }
-
     }
 
     // Cria a referência viewHolder (resposável por fazer o bind das views)
