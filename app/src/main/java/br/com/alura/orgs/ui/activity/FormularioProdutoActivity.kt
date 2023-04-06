@@ -8,6 +8,7 @@ import br.com.alura.orgs.databinding.ActivityFormularioProdutoBinding
 import br.com.alura.orgs.databinding.FormularioImagemBinding
 import br.com.alura.orgs.extension.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
+import br.com.alura.orgs.ui.dialog.FormularioImagemDialog
 import java.math.BigDecimal
 
 // Sem usar o View Bind seria dessa forma
@@ -35,7 +36,12 @@ class FormularioProdutoActivity : AppCompatActivity() {
         binding
             .activityFormularioProdutoImagem
             .setOnClickListener {
-
+                FormularioImagemDialog(this)
+                    .mostra { imagem ->
+                        url = imagem
+                        binding.activityFormularioProdutoImagem
+                            .tentaCarregarImagem(url, this)
+                    }
             }
     }
 
