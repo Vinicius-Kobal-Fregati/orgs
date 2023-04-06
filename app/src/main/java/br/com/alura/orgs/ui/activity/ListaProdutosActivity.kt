@@ -49,6 +49,15 @@ class ListaProdutosActivity : AppCompatActivity() {
     private fun configuraRecyclerView() {
         val recyclerView = binding.activityListaProdutoRecyclerView
         recyclerView.adapter = adapter
+        adapter.quandoClicaNoItemListener = { produto ->
+            val intentParaDetalhes = Intent(
+                this,
+                DetalhesProdutoActivity::class.java
+            ).apply {
+                putExtra(CHAVE_PRODUTO, produto)
+            }
+            startActivity(intentParaDetalhes)
+        }
 
         // O RecyclerView exige um layoutManager para exibir a lista
         // Pode ser por código ou pelo layout

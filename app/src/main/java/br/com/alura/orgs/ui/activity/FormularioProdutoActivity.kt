@@ -6,9 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import br.com.alura.orgs.dao.ProdutosDao
 import br.com.alura.orgs.databinding.ActivityFormularioProdutoBinding
 import br.com.alura.orgs.databinding.FormularioImagemBinding
+import br.com.alura.orgs.extension.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
-import br.com.alura.orgs.util.GifLoader
-import coil.load
+import br.com.alura.orgs.ui.dialog.FormularioImagemDialog
 import java.math.BigDecimal
 
 // Sem usar o View Bind seria dessa forma
@@ -31,38 +31,18 @@ class FormularioProdutoActivity : AppCompatActivity() {
 
         // Com o View Binding, precisamos passar esse root
         setContentView(binding.root)
+        title = "Cadastrar produto"
         configuraBotaoSalvar()
 
         binding
             .activityFormularioProdutoImagem
             .setOnClickListener {
-                val bindingFormularioImagem = FormularioImagemBinding
-                    .inflate(layoutInflater)
-                bindingFormularioImagem.formularioImagemBotaoCarregar.setOnClickListener {
-                    val url = bindingFormularioImagem.formularioImagemUrl.text.toString()
-                    bindingFormularioImagem.formularioImagemImageview.load(
-                        url,
-                        GifLoader.geraImageLoader(this)
-                    )
-                }
-
-                AlertDialog.Builder(this)
-                    //.setTitle("Título de teste")
-                    //.setMessage("Mensagem de teste")
-                    // Dessa forma não temos acesso aos campos, vamos ter que inflar a view
-                    //.setView(R.layout.formulario_imagem)
-                    .setView(bindingFormularioImagem.root)
-                    .setPositiveButton("Confirmar") { _, _ ->
-                        url = bindingFormularioImagem.formularioImagemUrl.text.toString()
-                        binding.activityFormularioProdutoImagem.load(
-                            url,
-                            GifLoader.geraImageLoader(this)
-                        )
+                FormularioImagemDialog(this)
+                    .mostra(url) { imagem ->
+                        url = imagem
+                        binding.activityFormularioProdutoImagem
+                            .tentaCarregarImagem(url, this)
                     }
-                    .setNegativeButton("Cancelar") { _, _ ->
-
-                    }
-                    .show()
             }
     }
 
