@@ -2,8 +2,10 @@ package br.com.alura.orgs.ui.recyclerview.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import br.com.alura.orgs.R
 import br.com.alura.orgs.databinding.ProdutoItemBinding
 import br.com.alura.orgs.model.Produto
 import br.com.alura.orgs.util.GifLoader
@@ -35,8 +37,26 @@ class ListaProdutosAdapter(
             val valor = binding.produtoItemValor
             val valorEmMoeda: String = formataParaMoedaBrasileira(produto.valor)
             valor.text = valorEmMoeda
+
+            val visibilidade = if (produto.imagem != null) {
+                View.VISIBLE
+            } else {
+                // Não aparece a view e ainda remove seu container (não ocupa espaço)
+                View.GONE
+                // O INVISIBLE não aparece a view mas ainda tem o espaço ocupado
+            }
+
+            binding.imageView.visibility = visibilidade
+
             // Esse load é uma extension function do coil
-            binding.imageView.load(produto.imagem, GifLoader.geraImageLoader(context))
+            binding.imageView.load(produto.imagem, GifLoader.geraImageLoader(context)) {
+                // Caso falhe (a imagem seja nula), ele adiciona uma imagem padrão
+                fallback(R.drawable.erro)
+
+                // Caso a imagem seja procurada e algo dê errado, ou não seja encontrada,
+                // Ele adiciona essa padrão
+                error(R.drawable.erro)
+            }
         }
 
         private fun formataParaMoedaBrasileira(valor: BigDecimal): String {
