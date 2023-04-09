@@ -3,9 +3,13 @@ package br.com.alura.orgs.ui.activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.room.Room
 import br.com.alura.orgs.dao.ProdutosDao
+import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityListaProdutosBinding
+import br.com.alura.orgs.model.Produto
 import br.com.alura.orgs.ui.recyclerview.adapter.ListaProdutosAdapter
+import java.math.BigDecimal
 
 class ListaProdutosActivity : AppCompatActivity() {
 
@@ -26,11 +30,29 @@ class ListaProdutosActivity : AppCompatActivity() {
         setContentView(binding.root)
         configuraRecyclerView()
         configuraFab()
+
+        val db = Room.databaseBuilder(
+            this,
+            AppDatabase::class.java,
+            "orgs.db"
+        )
+            .allowMainThreadQueries()
+            .build()
+
+        val produtoDao = db.produtoDao()
+        produtoDao.salva(
+            Produto(
+                nome = "Teste nome 1",
+                descricao = "Teste desc 1",
+                valor = BigDecimal("10.0")
+            )
+        )
+        adapter.atualiza(produtoDao.buscaTodos())
     }
 
     override fun onResume() {
         super.onResume()
-        adapter.atualiza(dao.buscaTodos())
+//        adapter.atualiza(dao.buscaTodos())
     }
 
     private fun configuraFab() {
