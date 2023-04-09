@@ -31,27 +31,17 @@ class ListaProdutosActivity : AppCompatActivity() {
         configuraRecyclerView()
         configuraFab()
 
-        val db = Room.databaseBuilder(
-            this,
-            AppDatabase::class.java,
-            "orgs.db"
-        )
-            .allowMainThreadQueries()
-            .build()
-
+        val db = AppDatabase.instancia(this)
         val produtoDao = db.produtoDao()
-        produtoDao.salva(
-            Produto(
-                nome = "Teste nome 1",
-                descricao = "Teste desc 1",
-                valor = BigDecimal("10.0")
-            )
-        )
         adapter.atualiza(produtoDao.buscaTodos())
     }
 
     override fun onResume() {
         super.onResume()
+        val db = AppDatabase.instancia(this)
+
+        val produtoDao = db.produtoDao()
+        adapter.atualiza(produtoDao.buscaTodos())
 //        adapter.atualiza(dao.buscaTodos())
     }
 
