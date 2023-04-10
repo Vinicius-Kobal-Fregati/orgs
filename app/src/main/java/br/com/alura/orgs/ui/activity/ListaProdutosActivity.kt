@@ -11,9 +11,7 @@ import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityListaProdutosBinding
 import br.com.alura.orgs.model.Produto
 import br.com.alura.orgs.ui.recyclerview.adapter.ListaProdutosAdapter
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 
 class ListaProdutosActivity : AppCompatActivity() {
 
@@ -32,20 +30,6 @@ class ListaProdutosActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Forma de testar as courotines, de forma síncrona
-        runBlocking {
-            Log.i("ListaProdutos", "onCreate: runBlocking init")
-            // Executa nossa courotine de forma assíncrona
-            launch {
-                Log.i("ListaProdutos", "onCreate: launch init")
-                // Trava a thread
-                //Thread.sleep(2000)
-                // Permite a suspensão da courotine, sem trava a thread
-                delay(2000)
-                Log.i("ListaProdutos", "onCreate: launch finish")
-            }
-            Log.i("ListaProdutos", "onCreate: runBlocking finish")
-        }
         //O R pode acessar tudo que está dentro de resources
         //setContentView(R.layout.activity_lista_produtos)
         setContentView(binding.root)
@@ -56,7 +40,19 @@ class ListaProdutosActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        adapter.atualiza(produtoDao.buscaTodos())
+        // Escopo da main
+        val scope = MainScope()
+        // Roda no scopo de courotine
+        scope.launch {
+            // Aqui mudamos o contexto da courotine
+            val produtos = withContext(Dispatchers.IO) {
+                //delay(2000)
+                // Retorna a última linha
+                produtoDao.buscaTodos()
+            }
+            //Quando ficar pronto, vai atualizar a tela
+            adapter.atualiza(produtos)
+        }
 //        adapter.atualiza(dao.buscaTodos())
     }
 
