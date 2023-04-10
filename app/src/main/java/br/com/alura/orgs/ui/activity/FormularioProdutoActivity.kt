@@ -3,8 +3,8 @@ package br.com.alura.orgs.ui.activity
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import br.com.alura.orgs.database.AppDatabase
+import br.com.alura.orgs.database.dao.ProdutoDao
 import br.com.alura.orgs.databinding.ActivityFormularioProdutoBinding
-import br.com.alura.orgs.extension.formataParaMoedaBrasileira
 import br.com.alura.orgs.extension.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
 import br.com.alura.orgs.ui.dialog.FormularioImagemDialog
@@ -21,7 +21,11 @@ class FormularioProdutoActivity : AppCompatActivity() {
         ActivityFormularioProdutoBinding.inflate(layoutInflater)
     }
     private var url: String? = null
-    private var idProduto = 0L
+    private var produtoId = 0L
+    private val produtoDao: ProdutoDao by lazy {
+        val db = AppDatabase.instancia(this)
+        db.produtoDao()
+    }
 
     // Com o AppCompatActivity, podemos deixar de usar o setContentView passando
     // para seu construtor
@@ -45,20 +49,43 @@ class FormularioProdutoActivity : AppCompatActivity() {
                     }
             }
 
-        intent.getParcelableExtra<Produto>(CHAVE_PRODUTO)?.let { produtoCarregado ->
+        tentaCarregarProduto()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        tentaBuscarProduto()
+    }
+
+    private fun tentaBuscarProduto() {
+        produtoDao.buscaPorId(produtoId)?.let {
             title = "Alterar produto"
-            url = produtoCarregado.imagem
-            idProduto = produtoCarregado.id
-            with(binding) {
-                activityFormularioProdutoImagem
-                    .tentaCarregarImagem(
-                        produtoCarregado.imagem,
-                        this@FormularioProdutoActivity
-                    )
-                activityFormularioProdutoNome.setText(produtoCarregado.nome)
-                activityFormularioProdutoDescricao.setText(produtoCarregado.descricao)
-                activityFormularioProdutoValor.setText(produtoCarregado.valor.toPlainString())
-            }
+            preencheCampos(it)
+        }
+    }
+
+    private fun tentaCarregarProduto() {
+        produtoId = intent.getLongExtra(CHAVE_PRODUTO_ID, 0L)
+
+        /*
+        intent.getParcelableExtra<Produto>(CHAVE_PRODUTO)?.let { produtoCarregado ->
+            produtoId = produtoCarregado.id
+            preencheCampos(produtoCarregado)
+        }
+         */
+    }
+
+    private fun preencheCampos(produto: Produto) {
+        url = produto.imagem
+        with(binding) {
+            activityFormularioProdutoImagem
+                .tentaCarregarImagem(
+                    produto.imagem,
+                    this@FormularioProdutoActivity
+                )
+            activityFormularioProdutoNome.setText(produto.nome)
+            activityFormularioProdutoDescricao.setText(produto.descricao)
+            activityFormularioProdutoValor.setText(produto.valor.toPlainString())
         }
     }
 
@@ -66,18 +93,20 @@ class FormularioProdutoActivity : AppCompatActivity() {
         //val botaoSalvar = findViewById<Button>(R.id.activity_formulario_produto_botao_salvar)
         val botaoSalvar = binding.activityFormularioProdutoBotaoSalvar
 //        val dao = ProdutosDao()
-        val db = AppDatabase.instancia(this)
-        val produtoDao = db.produtoDao()
 
         botaoSalvar.setOnClickListener {
             val produtoNovo = criaProduto()
-            if (idProduto > 0) {
+            /*
+            // Com o Replace no onConflict do salva, não precisamos mais desse código
+            if (produtoId > 0) {
                 produtoDao.altera(produtoNovo)
             } else {
 //              dao.adiciona(produtoNovo)
                 produtoDao.salva(produtoNovo)
 
             }
+             */
+            produtoDao.salva(produtoNovo)
             //Finaliza a activity
             finish()
         }
@@ -102,7 +131,7 @@ class FormularioProdutoActivity : AppCompatActivity() {
 
         return Produto(
             // Como possibilitamos o update, precisamos mandar o id também
-            id = idProduto,
+            id = produtoId,
             nome = nome,
             descricao = descricao,
             valor = valor,

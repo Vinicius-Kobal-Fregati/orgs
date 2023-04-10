@@ -57,7 +57,8 @@ class ListaProdutosActivity : AppCompatActivity() {
                 this,
                 DetalhesProdutoActivity::class.java
             ).apply {
-                putExtra(CHAVE_PRODUTO, produto)
+//                putExtra(CHAVE_PRODUTO, produto)
+                putExtra(CHAVE_PRODUTO_ID, produto.id)
             }
             startActivity(intentParaDetalhes)
         }
