@@ -18,4 +18,8 @@ interface ProdutoDao {
 
     @Update
     fun altera(produto: Produto)
+
+    // Como podemos não ter um produto com o id específico, pode-se retornar null
+    @Query("SELECT * FROM Produto WHERE id = :id")
+    fun buscaPorId(id: Long) : Produto?
 }
