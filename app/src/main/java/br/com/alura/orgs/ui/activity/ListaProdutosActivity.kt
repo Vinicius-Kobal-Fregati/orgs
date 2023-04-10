@@ -2,6 +2,7 @@ package br.com.alura.orgs.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityListaProdutosBinding
@@ -60,9 +61,15 @@ class ListaProdutosActivity : AppCompatActivity() {
             }
             startActivity(intentParaDetalhes)
         }
-
-        // O RecyclerView exige um layoutManager para exibir a lista
-        // Pode ser por código ou pelo layout
-        //recyclerView.layoutManager = LinearLayoutManager(this)
+        adapter.quandoClicaEmEditar = { produto ->
+            Log.i("quandoClicaEmEditar", "configuraRecyclerView: $produto")
+        }
+        adapter.quandoClicaEmRemover = { produto ->
+            Log.i("quandoClicaEmRemover", "configuraRecyclerView: $produto")
+        }
     }
+
+    // O RecyclerView exige um layoutManager para exibir a lista
+    // Pode ser por código ou pelo layout
+    //recyclerView.layoutManager = LinearLayoutManager(this)
 }

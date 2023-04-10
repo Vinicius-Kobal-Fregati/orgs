@@ -3,10 +3,13 @@ package br.com.alura.orgs.ui.recyclerview.adapter
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import br.com.alura.orgs.R
 import br.com.alura.orgs.databinding.ProdutoItemBinding
 import br.com.alura.orgs.extension.formataParaMoedaBrasileira
 import br.com.alura.orgs.extension.tentaCarregarImagem
@@ -18,7 +21,9 @@ import java.util.*
 class ListaProdutosAdapter(
     private val context: Context,
     produtos: List<Produto> = emptyList(),
-    var quandoClicaNoItemListener: (produto: Produto) -> Unit = {}
+    var quandoClicaNoItemListener: (produto: Produto) -> Unit = {},
+    var quandoClicaEmEditar: (produto: Produto) -> Unit = {},
+    var quandoClicaEmRemover: (produto: Produto) -> Unit = {}
 ) : RecyclerView.Adapter<ListaProdutosAdapter.ViewHolder>() {
 
     // Trabalhamos com uma cópia, mantendo o original seguro
@@ -29,7 +34,7 @@ class ListaProdutosAdapter(
 
     //Utilizamos o inner para ter acesso aos membros da classe superior, o quandoClicaNoItemListener
     inner class ViewHolder(private val binding: ProdutoItemBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+        RecyclerView.ViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
 
         // O lateinit evita nullables, assim a property pode ser inicializada depois
         private lateinit var produto: Produto
@@ -41,6 +46,37 @@ class ListaProdutosAdapter(
                     // Precisa do inner para podermos usar este membro
                     quandoClicaNoItemListener(produto)
                 }
+            }
+
+            itemView.setOnLongClickListener {
+                PopupMenu(context, it).apply {
+                    //inflate(R.menu.menu_detalhes_produto)
+                    // Poderíamos ter usado o inflate também
+                    menuInflater.inflate(
+                        R.menu.menu_detalhes_produto,
+                        menu
+                    )
+
+                    // Se não tivéssemos implementado a interface OnMenuItemClickListener,
+                    // poderíamos ter feito dessa forma
+//                    setOnMenuItemClickListener { item ->
+//                        when (item.itemId) {
+//                            R.id.menu_detalhes_produto_remover -> {
+//                                quandoClicaEmRemover(produto)
+//                            }
+//                            R.id.menu_detalhes_produto_editar -> {
+//                                quandoClicaEmEditar(produto)
+//                            }
+//                        }
+//                        return@setOnMenuItemClickListener true
+//                    }
+
+                    // Usará o onMenuItemClick
+                    setOnMenuItemClickListener(this@ViewHolder)
+                }.show()
+                // Retornamos true para ele consumir o evento e não acionar outro listener,
+                // como o clickListener
+                true
             }
         }
 
@@ -67,6 +103,21 @@ class ListaProdutosAdapter(
 
             // Esse load é uma extension function do coil
             binding.imageView.tentaCarregarImagem(produto.imagem, context)
+        }
+
+        override fun onMenuItemClick(item: MenuItem?): Boolean {
+            item?.let {
+                when (it.itemId) {
+                    R.id.menu_detalhes_produto_editar -> {
+                        quandoClicaEmEditar(produto)
+                    }
+                    R.id.menu_detalhes_produto_remover -> {
+                        quandoClicaEmRemover(produto)
+                    }
+                }
+            }
+            // Consome o evento de click
+            return true
         }
     }
 
