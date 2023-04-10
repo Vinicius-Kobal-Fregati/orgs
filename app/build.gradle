@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-parcelize'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -16,6 +17,15 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+//      Fazemos essa configuração para gerar o schema do banco de dados
+//      Isso nos ajudará a trabalhar com migrations
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation":
+                                      "$projectDir/schemas".toString()]
+            }
+        }
     }
 
     buildTypes {
@@ -37,6 +47,12 @@ android {
 }
 
 dependencies {
+    def room_version = "2.5.1"
+
+    implementation "androidx.room:room-runtime:$room_version"
+//  Utilizamos o kapt no lugar do annotationProcessor para ele funcionar para o kotlin
+//  O annotationProcessor funciona só para Java
+    kapt "androidx.room:room-compiler:$room_version"
 
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
