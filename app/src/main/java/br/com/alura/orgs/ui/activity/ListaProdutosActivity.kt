@@ -85,6 +85,12 @@ class ListaProdutosActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    private fun vaiParaFormularioProdutoComId(id: Long) {
+        Intent(this, FormularioProdutoActivity::class.java)
+            .apply { putExtra(CHAVE_PRODUTO_ID, id) }
+            .let { startActivity(it) }
+    }
+
     private fun configuraRecyclerView() {
         val recyclerView = binding.activityListaProdutoRecyclerView
         recyclerView.adapter = adapter
@@ -99,10 +105,11 @@ class ListaProdutosActivity : AppCompatActivity() {
             startActivity(intentParaDetalhes)
         }
         adapter.quandoClicaEmEditar = { produto ->
-            Log.i("quandoClicaEmEditar", "configuraRecyclerView: $produto")
+            vaiParaFormularioProdutoComId(produto.id)
         }
-        adapter.quandoClicaEmRemover = { produto ->
-            Log.i("quandoClicaEmRemover", "configuraRecyclerView: $produto")
+        adapter.quandoClicaEmRemover = { produto, index ->
+            produtoDao.remove(produto)
+            adapter.remove(index)
         }
     }
 
