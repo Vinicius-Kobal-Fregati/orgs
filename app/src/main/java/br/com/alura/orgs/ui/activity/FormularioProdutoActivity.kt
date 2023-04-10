@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityFormularioProdutoBinding
+import br.com.alura.orgs.extension.formataParaMoedaBrasileira
 import br.com.alura.orgs.extension.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
 import br.com.alura.orgs.ui.dialog.FormularioImagemDialog
@@ -20,6 +21,7 @@ class FormularioProdutoActivity : AppCompatActivity() {
         ActivityFormularioProdutoBinding.inflate(layoutInflater)
     }
     private var url: String? = null
+    private var idProduto = 0L
 
     // Com o AppCompatActivity, podemos deixar de usar o setContentView passando
     // para seu construtor
@@ -42,6 +44,22 @@ class FormularioProdutoActivity : AppCompatActivity() {
                             .tentaCarregarImagem(url, this)
                     }
             }
+
+        intent.getParcelableExtra<Produto>(CHAVE_PRODUTO)?.let { produtoCarregado ->
+            title = "Alterar produto"
+            url = produtoCarregado.imagem
+            idProduto = produtoCarregado.id
+            with(binding) {
+                activityFormularioProdutoImagem
+                    .tentaCarregarImagem(
+                        produtoCarregado.imagem,
+                        this@FormularioProdutoActivity
+                    )
+                activityFormularioProdutoNome.setText(produtoCarregado.nome)
+                activityFormularioProdutoDescricao.setText(produtoCarregado.descricao)
+                activityFormularioProdutoValor.setText(produtoCarregado.valor.toPlainString())
+            }
+        }
     }
 
     private fun configuraBotaoSalvar() {
