@@ -3,9 +3,13 @@ package br.com.alura.orgs.ui.activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import br.com.alura.orgs.R
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityListaProdutosBinding
+import br.com.alura.orgs.model.Produto
 import br.com.alura.orgs.ui.recyclerview.adapter.ListaProdutosAdapter
 
 class ListaProdutosActivity : AppCompatActivity() {
@@ -16,6 +20,10 @@ class ListaProdutosActivity : AppCompatActivity() {
     )
     private val binding by lazy {
         ActivityListaProdutosBinding.inflate(layoutInflater)
+    }
+    private val produtoDao by lazy {
+        val db = AppDatabase.instancia(this)
+        db.produtoDao()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,10 +38,38 @@ class ListaProdutosActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        val db = AppDatabase.instancia(this)
-        val produtoDao = db.produtoDao()
+
         adapter.atualiza(produtoDao.buscaTodos())
 //        adapter.atualiza(dao.buscaTodos())
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_lista_produtos, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val produtosOrdenado: List<Produto>? = when (item.itemId) {
+            R.id.menu_lista_produtos_ordenar_nome_asc ->
+                produtoDao.buscaTodosOrdenadorPorNomeAsc()
+            R.id.menu_lista_produtos_ordenar_nome_desc ->
+                produtoDao.buscaTodosOrdenadorPorNomeDesc()
+            R.id.menu_lista_produtos_ordenar_descricao_asc ->
+                produtoDao.buscaTodosOrdenadorPorDescricaoAsc()
+            R.id.menu_lista_produtos_ordenar_descricao_desc ->
+                produtoDao.buscaTodosOrdenadorPorDescricaoDesc()
+            R.id.menu_lista_produtos_ordenar_valor_asc ->
+                produtoDao.buscaTodosOrdenadorPorValorAsc()
+            R.id.menu_lista_produtos_ordenar_valor_desc ->
+                produtoDao.buscaTodosOrdenadorPorValorDesc()
+            R.id.menu_lista_produtos_ordenar_sem_ordem ->
+                produtoDao.buscaTodos()
+            else -> null
+        }
+        produtosOrdenado?.let { produtos ->
+            adapter.atualiza(produtos)
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun configuraFab() {
@@ -49,6 +85,12 @@ class ListaProdutosActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    private fun vaiParaFormularioProdutoComId(id: Long) {
+        Intent(this, FormularioProdutoActivity::class.java)
+            .apply { putExtra(CHAVE_PRODUTO_ID, id) }
+            .let { startActivity(it) }
+    }
+
     private fun configuraRecyclerView() {
         val recyclerView = binding.activityListaProdutoRecyclerView
         recyclerView.adapter = adapter
@@ -57,15 +99,17 @@ class ListaProdutosActivity : AppCompatActivity() {
                 this,
                 DetalhesProdutoActivity::class.java
             ).apply {
-                putExtra(CHAVE_PRODUTO, produto)
+//                putExtra(CHAVE_PRODUTO, produto)
+                putExtra(CHAVE_PRODUTO_ID, produto.id)
             }
             startActivity(intentParaDetalhes)
         }
         adapter.quandoClicaEmEditar = { produto ->
-            Log.i("quandoClicaEmEditar", "configuraRecyclerView: $produto")
+            vaiParaFormularioProdutoComId(produto.id)
         }
-        adapter.quandoClicaEmRemover = { produto ->
-            Log.i("quandoClicaEmRemover", "configuraRecyclerView: $produto")
+        adapter.quandoClicaEmRemover = { produto, index ->
+            produtoDao.remove(produto)
+            adapter.remove(index)
         }
     }
 

@@ -1,29 +1,24 @@
 package br.com.alura.orgs.ui.recyclerview.adapter
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import br.com.alura.orgs.R
 import br.com.alura.orgs.databinding.ProdutoItemBinding
 import br.com.alura.orgs.extension.formataParaMoedaBrasileira
 import br.com.alura.orgs.extension.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
-import java.math.BigDecimal
-import java.text.NumberFormat
-import java.util.*
 
 class ListaProdutosAdapter(
     private val context: Context,
     produtos: List<Produto> = emptyList(),
     var quandoClicaNoItemListener: (produto: Produto) -> Unit = {},
     var quandoClicaEmEditar: (produto: Produto) -> Unit = {},
-    var quandoClicaEmRemover: (produto: Produto) -> Unit = {}
+    var quandoClicaEmRemover: (produto: Produto, item: Int) -> Unit = { produto: Produto, index: Int -> }
 ) : RecyclerView.Adapter<ListaProdutosAdapter.ViewHolder>() {
 
     // Trabalhamos com uma cópia, mantendo o original seguro
@@ -112,7 +107,7 @@ class ListaProdutosAdapter(
                         quandoClicaEmEditar(produto)
                     }
                     R.id.menu_detalhes_produto_remover -> {
-                        quandoClicaEmRemover(produto)
+                        quandoClicaEmRemover(produto, bindingAdapterPosition)
                     }
                 }
             }
@@ -148,5 +143,12 @@ class ListaProdutosAdapter(
         this.produtos.addAll(produtos)
         // Notifica que os dados foram alterados
         notifyDataSetChanged()
+    }
+
+    // Assim evitamos uma busca a mais no banco de dados
+    // Se tivermos utilizado alguma ordenação, dessa forma elas erá mantida!
+    fun remove(id: Int) {
+        this.produtos.removeAt(id)
+        notifyItemRemoved(id)
     }
 }
