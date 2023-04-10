@@ -71,8 +71,13 @@ class FormularioProdutoActivity : AppCompatActivity() {
 
         botaoSalvar.setOnClickListener {
             val produtoNovo = criaProduto()
-//            dao.adiciona(produtoNovo)
-            produtoDao.salva(produtoNovo)
+            if (idProduto > 0) {
+                produtoDao.altera(produtoNovo)
+            } else {
+//              dao.adiciona(produtoNovo)
+                produtoDao.salva(produtoNovo)
+
+            }
             //Finaliza a activity
             finish()
         }
@@ -96,6 +101,8 @@ class FormularioProdutoActivity : AppCompatActivity() {
         }
 
         return Produto(
+            // Como possibilitamos o update, precisamos mandar o id também
+            id = idProduto,
             nome = nome,
             descricao = descricao,
             valor = valor,
