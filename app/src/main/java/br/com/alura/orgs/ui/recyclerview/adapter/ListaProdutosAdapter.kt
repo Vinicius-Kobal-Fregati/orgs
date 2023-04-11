@@ -18,7 +18,7 @@ class ListaProdutosAdapter(
     produtos: List<Produto> = emptyList(),
     var quandoClicaNoItemListener: (produto: Produto) -> Unit = {},
     var quandoClicaEmEditar: (produto: Produto) -> Unit = {},
-    var quandoClicaEmRemover: (produto: Produto, item: Int) -> Unit = { produto: Produto, index: Int -> }
+    var quandoClicaEmRemover: (produto: Produto, index: Int) -> Unit = { produto: Produto, index: Int -> }
 ) : RecyclerView.Adapter<ListaProdutosAdapter.ViewHolder>() {
 
     // Trabalhamos com uma cópia, mantendo o original seguro
