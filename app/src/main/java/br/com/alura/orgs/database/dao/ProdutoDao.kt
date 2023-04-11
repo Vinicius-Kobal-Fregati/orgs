@@ -2,6 +2,7 @@ package br.com.alura.orgs.database.dao
 
 import androidx.room.*
 import br.com.alura.orgs.model.Produto
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProdutoDao {
@@ -9,7 +10,8 @@ interface ProdutoDao {
     // no escopo IO, o programa que vai cuidar disso
 
     @Query("SELECT * FROM Produto")
-    suspend fun buscaTodos(): List<Produto>
+    // Quando o retorno é um flow, não podemos ter uma suspend function
+    fun buscaTodos(): Flow<List<Produto>>
 
     @Query("SELECT * FROM Produto ORDER BY nome ASC")
     suspend fun buscaTodosOrdenadorPorNomeAsc(): List<Produto>

@@ -22,6 +22,8 @@ abstract class AppDatabase : RoomDatabase() {
 
         // Indica para todas as threads que o valor é inserido na property
         // Assim, outras threads não vão atribuir um novo valor para ele
+        // Se duas threads acessarem ao mesmo tempo, quando a primeira definir esse valor,
+        // a segunda já o utilizará
         // Garante a estabilidade, integridade e unicidade do singleton
         @Volatile
         private lateinit var db: AppDatabase

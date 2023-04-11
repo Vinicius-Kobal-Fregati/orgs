@@ -14,6 +14,10 @@ import br.com.alura.orgs.databinding.ActivityListaProdutosBinding
 import br.com.alura.orgs.model.Produto
 import br.com.alura.orgs.ui.recyclerview.adapter.ListaProdutosAdapter
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.toCollection
+import kotlinx.coroutines.flow.toList
 
 class ListaProdutosActivity : AppCompatActivity() {
 
@@ -38,6 +42,24 @@ class ListaProdutosActivity : AppCompatActivity() {
         setContentView(binding.root)
         configuraRecyclerView()
         configuraFab()
+        val fluxoDeNumeros = flow<Int> {
+            repeat(100) {
+                emit(it)
+                delay(1000)
+            }
+        }
+        lifecycleScope.launch {
+            // Função de suspensão
+            fluxoDeNumeros.collect { numero ->
+                Log.i("TAG", "onCreate: $numero")
+            }
+        }
+        lifecycleScope.launch {
+            produtoDao.buscaTodos().collect {
+                //Quando ficar pronto, vai atualizar a tela
+                adapter.atualiza(it)
+            }
+        }
     }
 
     override fun onResume() {
@@ -57,20 +79,21 @@ class ListaProdutosActivity : AppCompatActivity() {
 
         // Roda no scopo de courotine
         // O lifecycleScope para a execução da coroutine caso a activity seja destruída
-        lifecycleScope.launch {
-            val produtos = buscaTodosProdutos()
-            //Quando ficar pronto, vai atualizar a tela
-            adapter.atualiza(produtos)
-        }
+//        lifecycleScope.launch {
+//            produtoDao.buscaTodos().collect {
+//                //Quando ficar pronto, vai atualizar a tela
+//                adapter.atualiza(it)
+//            }
+//        }
 //        adapter.atualiza(dao.buscaTodos())
     }
 
     // Esse suspend faz com que esse código só possa ser chamado dentro de uma coroutine
-    private suspend fun buscaTodosProdutos(): List<Produto> =
+//    private suspend fun buscaTodosProdutos(): List<Produto> =
 //        withContext(Dispatchers.IO) {
     //delay(2000)
-        // Retorna a última linha
-        produtoDao.buscaTodos()
+    // Retorna a última linha
+//        produtoDao.buscaTodos()
 //        }
 
     private fun criacaoDoHandlerParaTratarCoroutine(): CoroutineExceptionHandler {
@@ -107,6 +130,12 @@ class ListaProdutosActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         lifecycleScope.launch {
+            if (item.itemId == R.id.menu_lista_produtos_ordenar_sem_ordem) {
+                produtoDao.buscaTodos().collect {
+                    adapter.atualiza(it)
+                }
+            }
+
             val produtosOrdenado: List<Produto>? = when (item.itemId) {
                 R.id.menu_lista_produtos_ordenar_nome_asc ->
                     produtoDao.buscaTodosOrdenadorPorNomeAsc()
@@ -120,8 +149,6 @@ class ListaProdutosActivity : AppCompatActivity() {
                     produtoDao.buscaTodosOrdenadorPorValorAsc()
                 R.id.menu_lista_produtos_ordenar_valor_desc ->
                     produtoDao.buscaTodosOrdenadorPorValorDesc()
-                R.id.menu_lista_produtos_ordenar_sem_ordem ->
-                    produtoDao.buscaTodos()
                 else -> null
             }
             produtosOrdenado?.let { produtos ->
