@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import br.com.alura.orgs.R
 import br.com.alura.orgs.database.AppDatabase
@@ -42,8 +43,22 @@ class ListaProdutosActivity : AppCompatActivity() {
 
         // Escopo da main
         val scope = MainScope()
+        // Esse coroutineExceptionHandler é como se fosse o catch
+        val handler = CoroutineExceptionHandler { coroutineContext, throwable ->
+            Toast.makeText(
+                this@ListaProdutosActivity,
+                "Ocorreu um problema handler",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
         // Roda no scopo de courotine
-        scope.launch {
+        scope.launch(handler) {
+            // Para pegar exceções dentro de coroutine, o try catch precisa estar dentro do escopo dela
+            // Se tiver escopos diferentes na coroutine, vamos ter que tratar elas também de forma interna
+            // Podemos passar o handler para tratar as exceções
+            MainScope().launch(handler) {
+                throw Exception("lançando uma exception na coroutine em outro escopo")
+            }
             // Aqui mudamos o contexto da courotine
             val produtos = withContext(Dispatchers.IO) {
                 //delay(2000)
@@ -52,6 +67,7 @@ class ListaProdutosActivity : AppCompatActivity() {
             }
             //Quando ficar pronto, vai atualizar a tela
             adapter.atualiza(produtos)
+            throw Exception("lançando uma exception de teste")
         }
 //        adapter.atualiza(dao.buscaTodos())
     }
