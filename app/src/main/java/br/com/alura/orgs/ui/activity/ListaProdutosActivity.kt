@@ -14,10 +14,7 @@ import br.com.alura.orgs.databinding.ActivityListaProdutosBinding
 import br.com.alura.orgs.model.Produto
 import br.com.alura.orgs.ui.recyclerview.adapter.ListaProdutosAdapter
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.toCollection
-import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.*
 
 class ListaProdutosActivity : AppCompatActivity() {
 
@@ -55,6 +52,7 @@ class ListaProdutosActivity : AppCompatActivity() {
             }
         }
         lifecycleScope.launch {
+            // Como é um flow, sempre que o banco atualizar, enviará a novidade para aqui
             produtoDao.buscaTodos().collect {
                 //Quando ficar pronto, vai atualizar a tela
                 adapter.atualiza(it)
@@ -108,7 +106,7 @@ class ListaProdutosActivity : AppCompatActivity() {
 
         // Para pegar exceções dentro de coroutine, o try catch precisa estar dentro do escopo dela
         // Se tiver escopos diferentes na coroutine, vamos ter que tratar elas também de forma interna
-        // Podemos passar o handler para tratar as exceções
+        // Podemos passar o handler para tratar as exceções pelo parâmetro context
         MainScope().launch(handler) {
             throw Exception("lançando uma exception na coroutine em outro escopo")
         }
@@ -130,13 +128,8 @@ class ListaProdutosActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         lifecycleScope.launch {
-            if (item.itemId == R.id.menu_lista_produtos_ordenar_sem_ordem) {
-                produtoDao.buscaTodos().collect {
-                    adapter.atualiza(it)
-                }
-            }
 
-            val produtosOrdenado: List<Produto>? = when (item.itemId) {
+            val produtosOrdenado: Flow<List<Produto>>? = when (item.itemId) {
                 R.id.menu_lista_produtos_ordenar_nome_asc ->
                     produtoDao.buscaTodosOrdenadorPorNomeAsc()
                 R.id.menu_lista_produtos_ordenar_nome_desc ->
@@ -149,10 +142,14 @@ class ListaProdutosActivity : AppCompatActivity() {
                     produtoDao.buscaTodosOrdenadorPorValorAsc()
                 R.id.menu_lista_produtos_ordenar_valor_desc ->
                     produtoDao.buscaTodosOrdenadorPorValorDesc()
+                R.id.menu_lista_produtos_ordenar_sem_ordem ->
+                    produtoDao.buscaTodos()
                 else -> null
             }
-            produtosOrdenado?.let { produtos ->
-                adapter.atualiza(produtos)
+            produtosOrdenado?.let { produtosFlow ->
+                produtosFlow.collect {
+                    adapter.atualiza(it)
+                }
             }
         }
         return super.onOptionsItemSelected(item)

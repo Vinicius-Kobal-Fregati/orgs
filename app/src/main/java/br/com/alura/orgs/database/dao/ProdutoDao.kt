@@ -11,25 +11,26 @@ interface ProdutoDao {
 
     @Query("SELECT * FROM Produto")
     // Quando o retorno é um flow, não podemos ter uma suspend function
+    // Para o flow funcionar, a instância do banco de dados deve ser Singleton
     fun buscaTodos(): Flow<List<Produto>>
 
     @Query("SELECT * FROM Produto ORDER BY nome ASC")
-    suspend fun buscaTodosOrdenadorPorNomeAsc(): List<Produto>
+    fun buscaTodosOrdenadorPorNomeAsc(): Flow<List<Produto>>
 
     @Query("SELECT * FROM Produto ORDER BY nome DESC")
-    suspend fun buscaTodosOrdenadorPorNomeDesc(): List<Produto>
+    fun buscaTodosOrdenadorPorNomeDesc(): Flow<List<Produto>>
 
     @Query("SELECT * FROM Produto ORDER BY descricao ASC")
-    suspend fun buscaTodosOrdenadorPorDescricaoAsc(): List<Produto>
+    fun buscaTodosOrdenadorPorDescricaoAsc(): Flow<List<Produto>>
 
     @Query("SELECT * FROM Produto ORDER BY descricao DESC")
-    suspend fun buscaTodosOrdenadorPorDescricaoDesc(): List<Produto>
+    fun buscaTodosOrdenadorPorDescricaoDesc(): Flow<List<Produto>>
 
     @Query("SELECT * FROM Produto ORDER BY valor ASC")
-    suspend fun buscaTodosOrdenadorPorValorAsc(): List<Produto>
+    fun buscaTodosOrdenadorPorValorAsc(): Flow<List<Produto>>
 
     @Query("SELECT * FROM Produto ORDER BY valor DESC")
-    suspend fun buscaTodosOrdenadorPorValorDesc(): List<Produto>
+    fun buscaTodosOrdenadorPorValorDesc(): Flow<List<Produto>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun salva(vararg produtos: Produto)

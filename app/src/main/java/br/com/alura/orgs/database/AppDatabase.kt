@@ -25,6 +25,7 @@ abstract class AppDatabase : RoomDatabase() {
         // Se duas threads acessarem ao mesmo tempo, quando a primeira definir esse valor,
         // a segunda já o utilizará
         // Garante a estabilidade, integridade e unicidade do singleton
+        // Flow da coroutine só funciona se for singleton
         @Volatile
         private lateinit var db: AppDatabase
 
