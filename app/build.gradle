@@ -53,8 +53,10 @@ dependencies {
 //  Utilizamos o kapt no lugar do annotationProcessor para ele funcionar para o kotlin
 //  O annotationProcessor funciona só para Java
     kapt "androidx.room:room-compiler:$room_version"
+//  Possibilita usar coroutines com o room
+    implementation "androidx.room:room-ktx:$room_version"
 
-    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.core:core-ktx:1.10.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
@@ -63,6 +65,23 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
+//  Processamento de imagem via url
     implementation "io.coil-kt:coil:1.2.2"
+//  Processamento de gif via url
     implementation "io.coil-kt:coil-gif:1.2.2"
+//  Trabalho com coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+//  Escopos do lifecycle
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
+
+//    O lifecycle estava dando erro de classe duplicada
+//    Isso resolveu o erro!
+    constraints {
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
+            because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
+        }
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0") {
+            because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
+        }
+    }
 }

@@ -22,7 +22,10 @@ abstract class AppDatabase : RoomDatabase() {
 
         // Indica para todas as threads que o valor é inserido na property
         // Assim, outras threads não vão atribuir um novo valor para ele
+        // Se duas threads acessarem ao mesmo tempo, quando a primeira definir esse valor,
+        // a segunda já o utilizará
         // Garante a estabilidade, integridade e unicidade do singleton
+        // Flow da coroutine só funciona se for singleton
         @Volatile
         private lateinit var db: AppDatabase
 
@@ -33,7 +36,7 @@ abstract class AppDatabase : RoomDatabase() {
                 AppDatabase::class.java,
                 "orgs.db"
             )
-                .allowMainThreadQueries()
+                //.allowMainThreadQueries()
                 .build().also {
                     db = it
                 }
