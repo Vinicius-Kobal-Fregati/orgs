@@ -6,13 +6,16 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import br.com.alura.orgs.R
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityDetalhesProdutoBinding
 import br.com.alura.orgs.extension.formataParaMoedaBrasileira
 import br.com.alura.orgs.extension.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class DetalhesProdutoActivity : AppCompatActivity() {
 
@@ -24,7 +27,7 @@ class DetalhesProdutoActivity : AppCompatActivity() {
     private val produtoDao by lazy {
         AppDatabase.instancia(this).produtoDao()
     }
-    private val scope = CoroutineScope(Dispatchers.IO)
+    private val scope = CoroutineScope(Dispatchers.Main)
 
     // Com lateinit, podemos inicializar posteriormente essa variável
     // Evita o nullable
@@ -42,16 +45,16 @@ class DetalhesProdutoActivity : AppCompatActivity() {
     }
 
     private fun buscaProdutoNoBanco() {
-        scope.launch {
+        lifecycleScope.launch {
+//            withContext(Dispatchers.IO) {
             // Além do delay poderia ser repeat de 100
             //delay(4000)
             produto = produtoDao.buscaPorId(produtoId)
+//            }
             // SEMPRE que formos alterar algo no visual, precisamos fazer na thread main
-            withContext(Dispatchers.Main) {
-                produto?.let {
-                    preencheCampos(it, this@DetalhesProdutoActivity)
-                } ?: finish()
-            }
+            produto?.let {
+                preencheCampos(it, this@DetalhesProdutoActivity)
+            } ?: finish()
         }
     }
 
@@ -68,9 +71,11 @@ class DetalhesProdutoActivity : AppCompatActivity() {
 //        if (::produto.isInitialized) {
         when (item.itemId) {
             R.id.menu_detalhes_produto_remover -> {
-                scope.launch {
+                lifecycleScope.launch {
+//                    withContext(Dispatchers.IO) {
                     produto?.let { produtoDao.remove(it) }
                     finish()
+//                    }
                 }
             }
             R.id.menu_detalhes_produto_editar -> {

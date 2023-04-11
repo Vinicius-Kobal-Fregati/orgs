@@ -7,6 +7,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import br.com.alura.orgs.R
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityListaProdutosBinding
@@ -27,7 +28,7 @@ class ListaProdutosActivity : AppCompatActivity() {
         val db = AppDatabase.instancia(this)
         db.produtoDao()
     }
-    private val job = Job()
+//    private val job = Job()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +45,35 @@ class ListaProdutosActivity : AppCompatActivity() {
 
         // Escopo da main
         val scope = MainScope()
+        // Para mandar o job, handler, dispatcher, etc... Mandamos através do +
+//        scope.launch(job + handler + Dispatchers.IO + CoroutineName("primaria")) {
+        // O retorno do launch é um job
+//        val jobPrimario: Job = lifecycleScope.launch {
+//            repeat(1000) {
+//                Log.i("repeat", "onResume: coroutine está em execução $it")
+//                delay(1000)
+//            }
+//        }
+
+        // Roda no scopo de courotine
+        // O lifecycleScope para a execução da coroutine caso a activity seja destruída
+        lifecycleScope.launch {
+            val produtos = buscaTodosProdutos()
+            //Quando ficar pronto, vai atualizar a tela
+            adapter.atualiza(produtos)
+        }
+//        adapter.atualiza(dao.buscaTodos())
+    }
+
+    // Esse suspend faz com que esse código só possa ser chamado dentro de uma coroutine
+    private suspend fun buscaTodosProdutos(): List<Produto> =
+//        withContext(Dispatchers.IO) {
+    //delay(2000)
+        // Retorna a última linha
+        produtoDao.buscaTodos()
+//        }
+
+    private fun criacaoDoHandlerParaTratarCoroutine(): CoroutineExceptionHandler {
         // Esse coroutineExceptionHandler é como se fosse o catch
         val handler = CoroutineExceptionHandler { coroutineContext, throwable ->
             Toast.makeText(
@@ -53,42 +83,22 @@ class ListaProdutosActivity : AppCompatActivity() {
             ).show()
         }
 
-        // Para mandar o job, handler, dispatcher, etc... Mandamos através do +
-//        scope.launch(job + handler + Dispatchers.IO + CoroutineName("primaria")) {
-        // O retorno de uma coroutine é um job
-        val jobPrimario: Job = scope.launch(job + handler) {
-            repeat(1000) {
-                Log.i("repeat", "onResume: coroutine está em execução $it")
-                delay(1000)
-            }
+        // Para pegar exceções dentro de coroutine, o try catch precisa estar dentro do escopo dela
+        // Se tiver escopos diferentes na coroutine, vamos ter que tratar elas também de forma interna
+        // Podemos passar o handler para tratar as exceções
+        MainScope().launch(handler) {
+            throw Exception("lançando uma exception na coroutine em outro escopo")
         }
 
-        // Roda no scopo de courotine
-        scope.launch(handler) {
-            // Para pegar exceções dentro de coroutine, o try catch precisa estar dentro do escopo dela
-            // Se tiver escopos diferentes na coroutine, vamos ter que tratar elas também de forma interna
-            // Podemos passar o handler para tratar as exceções
-            MainScope().launch(handler) {
-                throw Exception("lançando uma exception na coroutine em outro escopo")
-            }
-            // Aqui mudamos o contexto da courotine
-            val produtos = withContext(Dispatchers.IO) {
-                //delay(2000)
-                // Retorna a última linha
-                produtoDao.buscaTodos()
-            }
-            //Quando ficar pronto, vai atualizar a tela
-            adapter.atualiza(produtos)
-            throw Exception("lançando uma exception de teste")
-        }
-//        adapter.atualiza(dao.buscaTodos())
+        return handler
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        // Quando a activity não estiver mais disponível, vamos cancelar a coroutine
-        job.cancel()
-    }
+//    override fun onDestroy() {
+//     Por causa do lifecycleScope, não precisamos mais disso
+//        super.onDestroy()
+//        // Quando a activity não estiver mais disponível, vamos cancelar a coroutine
+//        job.cancel()
+//    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_lista_produtos, menu)
@@ -96,25 +106,27 @@ class ListaProdutosActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val produtosOrdenado: List<Produto>? = when (item.itemId) {
-            R.id.menu_lista_produtos_ordenar_nome_asc ->
-                produtoDao.buscaTodosOrdenadorPorNomeAsc()
-            R.id.menu_lista_produtos_ordenar_nome_desc ->
-                produtoDao.buscaTodosOrdenadorPorNomeDesc()
-            R.id.menu_lista_produtos_ordenar_descricao_asc ->
-                produtoDao.buscaTodosOrdenadorPorDescricaoAsc()
-            R.id.menu_lista_produtos_ordenar_descricao_desc ->
-                produtoDao.buscaTodosOrdenadorPorDescricaoDesc()
-            R.id.menu_lista_produtos_ordenar_valor_asc ->
-                produtoDao.buscaTodosOrdenadorPorValorAsc()
-            R.id.menu_lista_produtos_ordenar_valor_desc ->
-                produtoDao.buscaTodosOrdenadorPorValorDesc()
-            R.id.menu_lista_produtos_ordenar_sem_ordem ->
-                produtoDao.buscaTodos()
-            else -> null
-        }
-        produtosOrdenado?.let { produtos ->
-            adapter.atualiza(produtos)
+        lifecycleScope.launch {
+            val produtosOrdenado: List<Produto>? = when (item.itemId) {
+                R.id.menu_lista_produtos_ordenar_nome_asc ->
+                    produtoDao.buscaTodosOrdenadorPorNomeAsc()
+                R.id.menu_lista_produtos_ordenar_nome_desc ->
+                    produtoDao.buscaTodosOrdenadorPorNomeDesc()
+                R.id.menu_lista_produtos_ordenar_descricao_asc ->
+                    produtoDao.buscaTodosOrdenadorPorDescricaoAsc()
+                R.id.menu_lista_produtos_ordenar_descricao_desc ->
+                    produtoDao.buscaTodosOrdenadorPorDescricaoDesc()
+                R.id.menu_lista_produtos_ordenar_valor_asc ->
+                    produtoDao.buscaTodosOrdenadorPorValorAsc()
+                R.id.menu_lista_produtos_ordenar_valor_desc ->
+                    produtoDao.buscaTodosOrdenadorPorValorDesc()
+                R.id.menu_lista_produtos_ordenar_sem_ordem ->
+                    produtoDao.buscaTodos()
+                else -> null
+            }
+            produtosOrdenado?.let { produtos ->
+                adapter.atualiza(produtos)
+            }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -155,8 +167,11 @@ class ListaProdutosActivity : AppCompatActivity() {
             vaiParaFormularioProdutoComId(produto.id)
         }
         adapter.quandoClicaEmRemover = { produto, index ->
-            produtoDao.remove(produto)
-            adapter.remove(index)
+            lifecycleScope.launch {
+                // Não precisamos trocar o escopo por conta do androidx.room:room-ktx
+                produtoDao.remove(produto)
+                adapter.remove(index)
+            }
         }
     }
 

@@ -2,6 +2,7 @@ package br.com.alura.orgs.ui.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.database.dao.ProdutoDao
 import br.com.alura.orgs.databinding.ActivityFormularioProdutoBinding
@@ -30,7 +31,7 @@ class FormularioProdutoActivity : AppCompatActivity() {
         val db = AppDatabase.instancia(this)
         db.produtoDao()
     }
-    private val scope = CoroutineScope(Dispatchers.IO)
+    private val scope = CoroutineScope(Dispatchers.Main)
 
     // Com o AppCompatActivity, podemos deixar de usar o setContentView passando
     // para seu construtor
@@ -63,13 +64,14 @@ class FormularioProdutoActivity : AppCompatActivity() {
     }
 
     private fun tentaBuscarProduto() {
-        scope.launch {
-            produtoDao.buscaPorId(produtoId)?.let {
-                withContext(Dispatchers.Main) {
+        lifecycleScope.launch {
+//            withContext(Dispatchers.IO) {
+            produtoDao.buscaPorId(produtoId)
+//            }
+                ?.let {
                     title = "Alterar produto"
                     preencheCampos(it)
                 }
-            }
         }
     }
 
@@ -115,10 +117,12 @@ class FormularioProdutoActivity : AppCompatActivity() {
 
             }
              */
-            scope.launch {
+            lifecycleScope.launch {
+//                withContext(Dispatchers.IO) {
                 produtoDao.salva(produtoNovo)
                 // Finaliza a activity
                 finish()
+//                }
             }
         }
     }

@@ -5,34 +5,36 @@ import br.com.alura.orgs.model.Produto
 
 @Dao
 interface ProdutoDao {
+    // Graças ao suspend e do androidx.room:room-ktx, não precisamos executar essas funções
+    // no escopo IO, o programa que vai cuidar disso
 
     @Query("SELECT * FROM Produto")
-    fun buscaTodos(): List<Produto>
+    suspend fun buscaTodos(): List<Produto>
 
     @Query("SELECT * FROM Produto ORDER BY nome ASC")
-    fun buscaTodosOrdenadorPorNomeAsc(): List<Produto>
+    suspend fun buscaTodosOrdenadorPorNomeAsc(): List<Produto>
 
     @Query("SELECT * FROM Produto ORDER BY nome DESC")
-    fun buscaTodosOrdenadorPorNomeDesc(): List<Produto>
+    suspend fun buscaTodosOrdenadorPorNomeDesc(): List<Produto>
 
     @Query("SELECT * FROM Produto ORDER BY descricao ASC")
-    fun buscaTodosOrdenadorPorDescricaoAsc(): List<Produto>
+    suspend fun buscaTodosOrdenadorPorDescricaoAsc(): List<Produto>
 
     @Query("SELECT * FROM Produto ORDER BY descricao DESC")
-    fun buscaTodosOrdenadorPorDescricaoDesc(): List<Produto>
+    suspend fun buscaTodosOrdenadorPorDescricaoDesc(): List<Produto>
 
     @Query("SELECT * FROM Produto ORDER BY valor ASC")
-    fun buscaTodosOrdenadorPorValorAsc(): List<Produto>
+    suspend fun buscaTodosOrdenadorPorValorAsc(): List<Produto>
 
     @Query("SELECT * FROM Produto ORDER BY valor DESC")
-    fun buscaTodosOrdenadorPorValorDesc(): List<Produto>
+    suspend fun buscaTodosOrdenadorPorValorDesc(): List<Produto>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun salva(vararg produtos: Produto)
+    suspend fun salva(vararg produtos: Produto)
 
     // O Delete e Update operam sobre o Id
     @Delete
-    fun remove(produto: Produto)
+    suspend fun remove(produto: Produto)
 
     // Com o onConflict Replace no salve, não precisamos do update
 //    @Update
@@ -40,5 +42,5 @@ interface ProdutoDao {
 
     // Como podemos não ter um produto com o id específico, pode-se retornar null
     @Query("SELECT * FROM Produto WHERE id = :id")
-    fun buscaPorId(id: Long): Produto?
+    suspend fun buscaPorId(id: Long): Produto?
 }
