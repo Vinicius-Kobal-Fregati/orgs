@@ -27,6 +27,7 @@ class ListaProdutosActivity : AppCompatActivity() {
         val db = AppDatabase.instancia(this)
         db.produtoDao()
     }
+    private val job = Job()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +52,17 @@ class ListaProdutosActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             ).show()
         }
+
+        // Para mandar o job, handler, dispatcher, etc... Mandamos através do +
+//        scope.launch(job + handler + Dispatchers.IO + CoroutineName("primaria")) {
+        // O retorno de uma coroutine é um job
+        val jobPrimario: Job = scope.launch(job + handler) {
+            repeat(1000) {
+                Log.i("repeat", "onResume: coroutine está em execução $it")
+                delay(1000)
+            }
+        }
+
         // Roda no scopo de courotine
         scope.launch(handler) {
             // Para pegar exceções dentro de coroutine, o try catch precisa estar dentro do escopo dela
@@ -70,6 +82,12 @@ class ListaProdutosActivity : AppCompatActivity() {
             throw Exception("lançando uma exception de teste")
         }
 //        adapter.atualiza(dao.buscaTodos())
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Quando a activity não estiver mais disponível, vamos cancelar a coroutine
+        job.cancel()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
