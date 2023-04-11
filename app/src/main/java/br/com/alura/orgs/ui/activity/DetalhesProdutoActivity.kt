@@ -12,9 +12,11 @@ import br.com.alura.orgs.databinding.ActivityDetalhesProdutoBinding
 import br.com.alura.orgs.extension.formataParaMoedaBrasileira
 import br.com.alura.orgs.extension.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
+import kotlinx.coroutines.*
 
 class DetalhesProdutoActivity : AppCompatActivity() {
 
+    private var produto: Produto? = null
     private var produtoId: Long = 0L
     private val binding by lazy {
         ActivityDetalhesProdutoBinding.inflate(layoutInflater)
@@ -22,11 +24,11 @@ class DetalhesProdutoActivity : AppCompatActivity() {
     private val produtoDao by lazy {
         AppDatabase.instancia(this).produtoDao()
     }
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     // Com lateinit, podemos inicializar posteriormente essa variável
     // Evita o nullable
     //private lateinit var produto: Produto
-    private var produto: Produto? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,10 +42,17 @@ class DetalhesProdutoActivity : AppCompatActivity() {
     }
 
     private fun buscaProdutoNoBanco() {
-        produto = produtoDao.buscaPorId(produtoId)
-        produto?.let {
-            preencheCampos(it, this)
-        } ?: finish()
+        scope.launch {
+            // Além do delay poderia ser repeat de 100
+            //delay(4000)
+            produto = produtoDao.buscaPorId(produtoId)
+            // SEMPRE que formos alterar algo no visual, precisamos fazer na thread main
+            withContext(Dispatchers.Main) {
+                produto?.let {
+                    preencheCampos(it, this@DetalhesProdutoActivity)
+                } ?: finish()
+            }
+        }
     }
 
     // Sobrescrita para criar menus
@@ -59,8 +68,10 @@ class DetalhesProdutoActivity : AppCompatActivity() {
 //        if (::produto.isInitialized) {
         when (item.itemId) {
             R.id.menu_detalhes_produto_remover -> {
-                produto?.let { produtoDao.remove(it) }
-                finish()
+                scope.launch {
+                    produto?.let { produtoDao.remove(it) }
+                    finish()
+                }
             }
             R.id.menu_detalhes_produto_editar -> {
                 Intent(this, FormularioProdutoActivity::class.java)

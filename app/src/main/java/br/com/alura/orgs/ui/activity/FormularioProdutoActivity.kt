@@ -8,6 +8,10 @@ import br.com.alura.orgs.databinding.ActivityFormularioProdutoBinding
 import br.com.alura.orgs.extension.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
 import br.com.alura.orgs.ui.dialog.FormularioImagemDialog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 
 // Sem usar o View Bind seria dessa forma
@@ -26,6 +30,7 @@ class FormularioProdutoActivity : AppCompatActivity() {
         val db = AppDatabase.instancia(this)
         db.produtoDao()
     }
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     // Com o AppCompatActivity, podemos deixar de usar o setContentView passando
     // para seu construtor
@@ -58,9 +63,13 @@ class FormularioProdutoActivity : AppCompatActivity() {
     }
 
     private fun tentaBuscarProduto() {
-        produtoDao.buscaPorId(produtoId)?.let {
-            title = "Alterar produto"
-            preencheCampos(it)
+        scope.launch {
+            produtoDao.buscaPorId(produtoId)?.let {
+                withContext(Dispatchers.Main) {
+                    title = "Alterar produto"
+                    preencheCampos(it)
+                }
+            }
         }
     }
 
@@ -106,9 +115,11 @@ class FormularioProdutoActivity : AppCompatActivity() {
 
             }
              */
-            produtoDao.salva(produtoNovo)
-            //Finaliza a activity
-            finish()
+            scope.launch {
+                produtoDao.salva(produtoNovo)
+                // Finaliza a activity
+                finish()
+            }
         }
     }
 
